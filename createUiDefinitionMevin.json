@@ -1,0 +1,349 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "config": {
+      "basics": {
+        "resourceGroup": {
+          "allowExisting": true
+        }
+      }
+    },
+    "basics": [],
+    "steps": [
+      {
+        "name": "windowsVM",
+        "label": "Windows VM",
+        "subLabel": {
+          "preValidation": "Authenticate to Windows Virtual Desktop to register the VMs to the service after provisioning.",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Authenticate to Windows Virtual Desktop",
+        "bladeSubtitle": "Authenticate to Windows Virtual Desktop",
+        "elements": [
+          {
+            "name": "adminUserName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Windows Virtual Machine username",
+            "toolTip": "admin username",
+            "constraints": {
+              "required": true,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid name."
+            }
+          },
+          {
+            "name": "adminPassword",
+            "type": "Microsoft.Compute.CredentialsCombo",
+            "label": {
+              "password": "Admin Password",
+              "confirmPassword": "Confirm password"
+            },
+            "osPlatform": "Windows",
+            "toolTip": {
+              "password": "password"
+            },
+            "constraints": {
+              "required": true,
+              "customValidationMessage": "The password must be alphanumeric, contain at least 12 characters, and have at least 1 letter and 1 number."
+            },
+            "options": {
+              "hideConfirmation": false
+            },
+            "visible": true
+          },
+          {
+            "name": "dnsLabel",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name of the DNS to be created",
+            "toolTip": "Name of the DNS to be created",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "publicIpName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name for the Public IP used to access the Virtual Machine.",
+            "toolTip": "public ip",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "publicIPAllocationMethod",
+            "type": "Microsoft.Common.OptionsGroup",
+            "label": "Allocation method for the Public IP used to access the Virtual Machine.",
+            "toolTip": "Allocation method",
+            "visible": true,
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "Dynamic",
+                  "value": "Dynamic"
+                },
+                {
+                  "label": "Static",
+                  "value": "Static"
+                }
+              ]
+            }
+          },
+          {
+            "name": "publicIpSku",
+            "type": "Microsoft.Common.OptionsGroup",
+            "label": "SKU for the Public IP used to access the Virtual Machine",
+            "toolTip": "public ip",
+            "visible": true,
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "Basic",
+                  "value": "Basic"
+                },
+                {
+                  "label": "Standard",
+                  "value": "Standard"
+                }
+              ]
+            }
+          },
+          {
+            "name": "OSVersion",
+            "type": "Microsoft.Common.OptionsGroup",
+            "label": "The Windows version for the VM. This will pick a fully patched image of this given Windows version.",
+            "toolTip": "os version",
+            "defaultValue": "2022-datacenter-azure-edition-core",
+            "visible": true,
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "2022-datacenter-azure-edition-core",
+                  "value": "2022-datacenter-azure-edition-core"
+                },
+                {
+                  "label": "2022-datacenter-core",
+                  "value": "2022-datacenter-core"
+                }
+              ]
+            }
+          },
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Size of the Virtual Machine.",
+            "toolTip": "VM Size",
+            "defaultValue": "Standard_DS1",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "location",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Location for all resources.",
+            "toolTip": "Location for all resources.",
+            "defaultValue": "[resourceGroup().location]",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "vmName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Virtual Machine Name",
+            "toolTip": "VM Size",
+            "defaultValue": "simple-vm-test",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          }
+        ]
+      },
+
+      {
+        "name": "linuxVM",
+        "label": "Linux VM",
+        "subLabel": {
+          "preValidation": "Authenticate to Linux Virtual Desktop to register the VMs to the service after provisioning.",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Authenticate to Linux Virtual Desktop",
+        "bladeSubtitle": "Authenticate to Linux Virtual Desktop",
+        "elements": [
+          {
+            "name": "vmNameLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Virtual Machine Name",
+            "toolTip": "VM Name",
+            "defaultValue": "simple-vm-linux-test",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "adminUsernameLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Admin username",
+            "toolTip": "admin user name",
+            "constraints": {
+              "required": true,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid name."
+            }
+          },
+          {
+            "name": "authenticationType",
+            "type": "Microsoft.Compute.CredentialsCombo",
+            "label": {
+              "authenticationType": "Authentication type",
+              "password": "adminPasswordOrKey",
+              "confirmPassword": "Confirm password",
+              "sshPublicKey": "SSH public key"
+            },
+            "toolTip": {
+              "authenticationType": " authentication Type",
+              "password": "adminPasswordOrKey",
+              "sshPublicKey": "ssh public key"
+            },
+            "constraints": {
+              "required": true,
+              "customValidationMessage": "The password must be alphanumeric, contain at least 12 characters, and have at least 1 letter and 1 number."
+            },
+            "options": { "hideConfirmation": false, "hidePassword": false },
+            "osPlatform": "Linux",
+            "visible": true
+          },
+
+          {
+            "name": "dnsLabelPrefixLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Unique DNS Name for the Public IP used to access the Virtual Machine.",
+            "toolTip": "Unique DNS Name for the Public IP used to access the Virtual Machine.",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "ubuntuOSVersion",
+            "type": "Microsoft.Common.DropDown",
+            "label": "The Ubuntu version for the VM",
+            "toolTip": "ubuntu version",
+            "defaultValue": "18.04-LTS",
+            "visible": true,
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "12.04.5-LTS",
+                  "value": "12.04.5-LTS"
+                },
+                {
+                  "label": "18.04-LTS",
+                  "value": "18.04-LTS"
+                }
+              ]
+            }
+          },
+          {
+            "name": "locationLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Location for all resources.",
+            "toolTip": "Location for all resources.",
+            "defaultValue": "[resourceGroup().location]",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Size of the Virtual Machine.",
+            "toolTip": "VM Size",
+            "defaultValue": "Standard_DS1",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "virtualNetworkName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name of the Vnet",
+            "toolTip": "name of the Vnet",
+            "defaultValue": "vNet",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "subnetName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name of the subnet in the virtual network",
+            "toolTip": "Name of the subnet in the virtual network",
+            "defaultValue": "Subnet",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          },
+          {
+            "name": "networkSecurityGroupName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name of the Network Security Group",
+            "toolTip": "Name of the Network Security Group",
+            "defaultValue": "SecGroupNet",
+            "visible": true,
+            "constraints": {
+              "required": false,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid"
+            }
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "publicIPAllocationMethod": "[steps('windowsVM').publicIPAllocationMethod]",
+      "publicIpSku": "[steps('windowsVM').publicIpSku]",
+      "OSVersion": "[steps('windowsVM').OSVersion]",
+      "ubuntuOSVersion": "[steps('linuxVM').ubuntuOSVersion]",
+      "location": "[location()]",
+      "adminUsername": "[steps('windowsVM').adminUserName]",
+      "adminPassword": "[steps('windowsVM').adminPassword]",
+      "adminUsernameLinux": "[steps('linuxVM').adminUsernameLinux]",
+      "adminPasswordOrKey": "[steps('linuxVM').authenticationType]"
+    }
+  }
+}

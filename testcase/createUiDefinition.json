@@ -3,13 +3,7 @@
   "handler": "Microsoft.Azure.CreateUIDef",
   "version": "0.1.2-preview",
   "parameters": {
-    "config": {
-      "basics": {
-        "resourceGroup": {
-          "allowExisting": true
-        }
-      }
-    },
+    "resourceTypes": ["microsoft.resources/resourcegroups"],
     "basics": [],
     "steps": [
       {
@@ -23,30 +17,29 @@
         "bladeSubtitle": "Authenticate to Windows Virtual Desktop",
         "elements": [
           {
-            "name": "adminUserName",
+            "name": "adminUsername",
             "type": "Microsoft.Common.TextBox",
-            "label": "Windows Virtual Machine username",
-            "toolTip": "admin username",
+            "label": "Admin Username",
+            "defaultValue": "",
+            "toolTip": "Username for the Virtual Machine.",
             "constraints": {
               "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
               "validationMessage": "invalid name."
-            }
+            },
+            "visible": true
           },
           {
             "name": "adminPassword",
-            "type": "Microsoft.Compute.CredentialsCombo",
+            "type": "Microsoft.Common.PasswordBox",
             "label": {
               "password": "Admin Password",
               "confirmPassword": "Confirm password"
             },
-            "osPlatform": "Windows",
-            "toolTip": {
-              "password": "password"
-            },
+            "toolTip": "Password for the Virtual Machine.",
             "constraints": {
-              "required": true,
-              "customValidationMessage": "The password must be alphanumeric, contain at least 12 characters, and have at least 1 letter and 1 number."
+              "required": false,
+              "validationMessage": "invalid"
             },
             "options": {
               "hideConfirmation": false
@@ -54,36 +47,39 @@
             "visible": true
           },
           {
-            "name": "dnsLabel",
+            "name": "dnsLabelPrefix",
             "type": "Microsoft.Common.TextBox",
-            "label": "Name of the DNS to be created",
-            "toolTip": "Name of the DNS to be created",
-            "visible": true,
+            "label": "Dns Label Prefix",
+            "defaultValue": "[[toLower(format('{0}-{1}', parameters('vmName'), uniqueString(resourceGroup().id, parameters('vmName'))))]",
+            "toolTip": "Unique DNS Name for the Public IP used to access the Virtual Machine.",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "publicIpName",
             "type": "Microsoft.Common.TextBox",
-            "label": "Name for the Public IP used to access the Virtual Machine.",
-            "toolTip": "public ip",
-            "visible": true,
+            "label": "Public Ip Name",
+            "defaultValue": "myPublicIP",
+            "toolTip": "Name for the Public IP used to access the Virtual Machine.",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "publicIPAllocationMethod",
-            "type": "Microsoft.Common.OptionsGroup",
-            "label": "Allocation method for the Public IP used to access the Virtual Machine.",
-            "toolTip": "Allocation method",
-            "visible": true,
+            "type": "Microsoft.Common.DropDown",
+            "label": "Public IP Allocation Method",
+            "defaultValue": "Dynamic",
+            "toolTip": "Allocation method for the Public IP used to access the Virtual Machine.",
             "constraints": {
+              "required": false,
               "allowedValues": [
                 {
                   "label": "Dynamic",
@@ -94,15 +90,17 @@
                   "value": "Static"
                 }
               ]
-            }
+            },
+            "visible": true
           },
           {
             "name": "publicIpSku",
-            "type": "Microsoft.Common.OptionsGroup",
-            "label": "SKU for the Public IP used to access the Virtual Machine",
-            "toolTip": "public ip",
-            "visible": true,
+            "type": "Microsoft.Common.DropDown",
+            "label": "Public Ip Sku",
+            "defaultValue": "Basic",
+            "toolTip": "SKU for the Public IP used to access the Virtual Machine.",
             "constraints": {
+              "required": false,
               "allowedValues": [
                 {
                   "label": "Basic",
@@ -113,237 +111,494 @@
                   "value": "Standard"
                 }
               ]
-            }
+            },
+            "visible": true
           },
           {
             "name": "OSVersion",
-            "type": "Microsoft.Common.OptionsGroup",
-            "label": "The Windows version for the VM. This will pick a fully patched image of this given Windows version.",
-            "toolTip": "os version",
+            "type": "Microsoft.Common.DropDown",
+            "label": "OS Version",
             "defaultValue": "2022-datacenter-azure-edition-core",
-            "visible": true,
+            "toolTip": "The Windows version for the VM. This will pick a fully patched image of this given Windows version.",
             "constraints": {
+              "required": false,
               "allowedValues": [
+                {
+                  "label": "2008-R2-SP1",
+                  "value": "2008-R2-SP1"
+                },
+                {
+                  "label": "2008-R2-SP1-smalldisk",
+                  "value": "2008-R2-SP1-smalldisk"
+                },
+                {
+                  "label": "2012-Datacenter",
+                  "value": "2012-Datacenter"
+                },
+                {
+                  "label": "2012-datacenter-gensecond",
+                  "value": "2012-datacenter-gensecond"
+                },
+                {
+                  "label": "2012-Datacenter-smalldisk",
+                  "value": "2012-Datacenter-smalldisk"
+                },
+                {
+                  "label": "2012-datacenter-smalldisk-g2",
+                  "value": "2012-datacenter-smalldisk-g2"
+                },
+                {
+                  "label": "2012-Datacenter-zhcn",
+                  "value": "2012-Datacenter-zhcn"
+                },
+                {
+                  "label": "2012-datacenter-zhcn-g2",
+                  "value": "2012-datacenter-zhcn-g2"
+                },
+                {
+                  "label": "2012-R2-Datacenter",
+                  "value": "2012-R2-Datacenter"
+                },
+                {
+                  "label": "2012-r2-datacenter-gensecond",
+                  "value": "2012-r2-datacenter-gensecond"
+                },
+                {
+                  "label": "2012-R2-Datacenter-smalldisk",
+                  "value": "2012-R2-Datacenter-smalldisk"
+                },
+                {
+                  "label": "2012-r2-datacenter-smalldisk-g2",
+                  "value": "2012-r2-datacenter-smalldisk-g2"
+                },
+                {
+                  "label": "2012-R2-Datacenter-zhcn",
+                  "value": "2012-R2-Datacenter-zhcn"
+                },
+                {
+                  "label": "2012-r2-datacenter-zhcn-g2",
+                  "value": "2012-r2-datacenter-zhcn-g2"
+                },
+                {
+                  "label": "2016-Datacenter",
+                  "value": "2016-Datacenter"
+                },
+                {
+                  "label": "2016-datacenter-gensecond",
+                  "value": "2016-datacenter-gensecond"
+                },
+                {
+                  "label": "2016-datacenter-gs",
+                  "value": "2016-datacenter-gs"
+                },
+                {
+                  "label": "2016-Datacenter-Server-Core",
+                  "value": "2016-Datacenter-Server-Core"
+                },
+                {
+                  "label": "2016-datacenter-server-core-g2",
+                  "value": "2016-datacenter-server-core-g2"
+                },
+                {
+                  "label": "2016-Datacenter-Server-Core-smalldisk",
+                  "value": "2016-Datacenter-Server-Core-smalldisk"
+                },
+                {
+                  "label": "2016-datacenter-server-core-smalldisk-g2",
+                  "value": "2016-datacenter-server-core-smalldisk-g2"
+                },
+                {
+                  "label": "2016-Datacenter-smalldisk",
+                  "value": "2016-Datacenter-smalldisk"
+                },
+                {
+                  "label": "2016-datacenter-smalldisk-g2",
+                  "value": "2016-datacenter-smalldisk-g2"
+                },
+                {
+                  "label": "2016-Datacenter-with-Containers",
+                  "value": "2016-Datacenter-with-Containers"
+                },
+                {
+                  "label": "2016-datacenter-with-containers-g2",
+                  "value": "2016-datacenter-with-containers-g2"
+                },
+                {
+                  "label": "2016-datacenter-with-containers-gs",
+                  "value": "2016-datacenter-with-containers-gs"
+                },
+                {
+                  "label": "2016-Datacenter-zhcn",
+                  "value": "2016-Datacenter-zhcn"
+                },
+                {
+                  "label": "2016-datacenter-zhcn-g2",
+                  "value": "2016-datacenter-zhcn-g2"
+                },
+                {
+                  "label": "2019-Datacenter",
+                  "value": "2019-Datacenter"
+                },
+                {
+                  "label": "2019-Datacenter-Core",
+                  "value": "2019-Datacenter-Core"
+                },
+                {
+                  "label": "2019-datacenter-core-g2",
+                  "value": "2019-datacenter-core-g2"
+                },
+                {
+                  "label": "2019-Datacenter-Core-smalldisk",
+                  "value": "2019-Datacenter-Core-smalldisk"
+                },
+                {
+                  "label": "2019-datacenter-core-smalldisk-g2",
+                  "value": "2019-datacenter-core-smalldisk-g2"
+                },
+                {
+                  "label": "2019-Datacenter-Core-with-Containers",
+                  "value": "2019-Datacenter-Core-with-Containers"
+                },
+                {
+                  "label": "2019-datacenter-core-with-containers-g2",
+                  "value": "2019-datacenter-core-with-containers-g2"
+                },
+                {
+                  "label": "2019-Datacenter-Core-with-Containers-smalldisk",
+                  "value": "2019-Datacenter-Core-with-Containers-smalldisk"
+                },
+                {
+                  "label": "2019-datacenter-core-with-containers-smalldisk-g2",
+                  "value": "2019-datacenter-core-with-containers-smalldisk-g2"
+                },
+                {
+                  "label": "2019-datacenter-gensecond",
+                  "value": "2019-datacenter-gensecond"
+                },
+                {
+                  "label": "2019-datacenter-gs",
+                  "value": "2019-datacenter-gs"
+                },
+                {
+                  "label": "2019-Datacenter-smalldisk",
+                  "value": "2019-Datacenter-smalldisk"
+                },
+                {
+                  "label": "2019-datacenter-smalldisk-g2",
+                  "value": "2019-datacenter-smalldisk-g2"
+                },
+                {
+                  "label": "2019-Datacenter-with-Containers",
+                  "value": "2019-Datacenter-with-Containers"
+                },
+                {
+                  "label": "2019-datacenter-with-containers-g2",
+                  "value": "2019-datacenter-with-containers-g2"
+                },
+                {
+                  "label": "2019-datacenter-with-containers-gs",
+                  "value": "2019-datacenter-with-containers-gs"
+                },
+                {
+                  "label": "2019-Datacenter-with-Containers-smalldisk",
+                  "value": "2019-Datacenter-with-Containers-smalldisk"
+                },
+                {
+                  "label": "2019-datacenter-with-containers-smalldisk-g2",
+                  "value": "2019-datacenter-with-containers-smalldisk-g2"
+                },
+                {
+                  "label": "2019-Datacenter-zhcn",
+                  "value": "2019-Datacenter-zhcn"
+                },
+                {
+                  "label": "2019-datacenter-zhcn-g2",
+                  "value": "2019-datacenter-zhcn-g2"
+                },
+                {
+                  "label": "2022-datacenter",
+                  "value": "2022-datacenter"
+                },
+                {
+                  "label": "2022-datacenter-azure-edition",
+                  "value": "2022-datacenter-azure-edition"
+                },
                 {
                   "label": "2022-datacenter-azure-edition-core",
                   "value": "2022-datacenter-azure-edition-core"
                 },
                 {
+                  "label": "2022-datacenter-azure-edition-core-smalldisk",
+                  "value": "2022-datacenter-azure-edition-core-smalldisk"
+                },
+                {
+                  "label": "2022-datacenter-azure-edition-smalldisk",
+                  "value": "2022-datacenter-azure-edition-smalldisk"
+                },
+                {
                   "label": "2022-datacenter-core",
                   "value": "2022-datacenter-core"
+                },
+                {
+                  "label": "2022-datacenter-core-g2",
+                  "value": "2022-datacenter-core-g2"
+                },
+                {
+                  "label": "2022-datacenter-core-smalldisk",
+                  "value": "2022-datacenter-core-smalldisk"
+                },
+                {
+                  "label": "2022-datacenter-core-smalldisk-g2",
+                  "value": "2022-datacenter-core-smalldisk-g2"
+                },
+                {
+                  "label": "2022-datacenter-g2",
+                  "value": "2022-datacenter-g2"
+                },
+                {
+                  "label": "2022-datacenter-smalldisk",
+                  "value": "2022-datacenter-smalldisk"
+                },
+                {
+                  "label": "2022-datacenter-smalldisk-g2",
+                  "value": "2022-datacenter-smalldisk-g2"
                 }
               ]
-            }
+            },
+            "visible": true
           },
           {
             "name": "vmSize",
             "type": "Microsoft.Common.TextBox",
-            "label": "Size of the Virtual Machine.",
-            "toolTip": "VM Size",
+            "label": "Vm Size",
             "defaultValue": "Standard_DS1",
-            "visible": true,
+            "toolTip": "Size of the virtual machine.",
             "constraints": {
               "required": false,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
               "validationMessage": "invalid"
-            }
+            },
+            "visible": true
           },
           {
             "name": "location",
             "type": "Microsoft.Common.TextBox",
-            "label": "Location for all resources.",
-            "toolTip": "Location for all resources.",
+            "label": "Location",
             "defaultValue": "[resourceGroup().location]",
-            "visible": true,
-            "constraints": {
-              "required": false,
-              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
-          },
-          {
-            "name": "vmName",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Virtual Machine Name",
-            "toolTip": "VM Size",
-            "defaultValue": "simple-vm-test",
-            "visible": true,
-            "constraints": {
-              "required": false,
-              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
-          }
-        ]
-      },
-
-      {
-        "name": "linuxVM",
-        "label": "Linux VM",
-        "subLabel": {
-          "preValidation": "Authenticate to Linux Virtual Desktop to register the VMs to the service after provisioning.",
-          "postValidation": "Done"
-        },
-        "bladeTitle": "Authenticate to Linux Virtual Desktop",
-        "bladeSubtitle": "Authenticate to Linux Virtual Desktop",
-        "elements": [
-          {
-            "name": "vmNameLinux",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Virtual Machine Name",
-            "toolTip": "VM Name",
-            "defaultValue": "simple-vm-linux-test",
-            "visible": true,
-            "constraints": {
-              "required": false,
-              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
-          },
-          {
-            "name": "adminUsernameLinux",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Admin username",
-            "toolTip": "admin user name",
+            "toolTip": "Location for all resources.",
             "constraints": {
               "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
               "validationMessage": "invalid name."
-            }
+            },
+            "visible": true
           },
           {
-            "name": "authenticationType",
-            "type": "Microsoft.Compute.CredentialsCombo",
-            "label": {
-              "authenticationType": "Authentication type",
-              "password": "adminPasswordOrKey",
-              "confirmPassword": "Confirm password",
-              "sshPublicKey": "SSH public key"
-            },
-            "toolTip": {
-              "authenticationType": " authentication Type",
-              "password": "adminPasswordOrKey",
-              "sshPublicKey": "ssh public key"
-            },
+            "name": "vmName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Vm Name",
+            "defaultValue": "simple-vm",
+            "toolTip": "Name of the virtual machine.",
             "constraints": {
               "required": true,
-              "customValidationMessage": "The password must be alphanumeric, contain at least 12 characters, and have at least 1 letter and 1 number."
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid name."
             },
-            "options": { "hideConfirmation": false, "hidePassword": false },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "name": "LinuxVM",
+        "label": "Linux VM",
+        "subLabel": {
+          "preValidation": "Authenticate to Windows Virtual Desktop to register the VMs to the service after provisioning.",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Authenticate to Windows Virtual Desktop",
+        "bladeSubtitle": "Authenticate to Windows Virtual Desktop",
+        "elements": [
+          {
+            "name": "vmNameLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Vm Name Linux",
+            "defaultValue": "simpleLinuxVM",
+            "toolTip": "The name of you Virtual Machine.",
+            "constraints": {
+              "required": true,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid name."
+            },
+            "visible": true
+          },
+          {
+            "name": "adminUsernameLinux",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Admin Username Linux",
+            "defaultValue": "",
+            "toolTip": "Username for the Virtual Machine.",
+            "constraints": {
+              "required": true,
+              "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
+              "validationMessage": "invalid name."
+            },
+            "visible": true
+          },
+          {
+            "name": "adminPasswordOrKeyauthenticationType",
+            "type": "Microsoft.Compute.CredentialsCombo",
+            "label": {
+              "authenticationType": "Authentication Type",
+              "password": "Admin Password Or Key",
+              "sshPublicKey": "Admin Password Or Key"
+            },
+            "toolTip": {
+              "authenticationType": "Type of authentication to use on the Virtual Machine. SSH key is recommended.",
+              "password": "Type of authentication to use on the Virtual Machine. SSH key is recommended.",
+              "sshPublicKey": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            },
+            "constraints": {
+              "required": true
+            },
+            "options": {
+              "hideConfirmation": false,
+              "hidePassword": false
+            },
             "osPlatform": "Linux",
             "visible": true
           },
-
           {
             "name": "dnsLabelPrefixLinux",
             "type": "Microsoft.Common.TextBox",
-            "label": "Unique DNS Name for the Public IP used to access the Virtual Machine.",
+            "label": "Dns Label Prefix Linux",
+            "defaultValue": "[[toLower(format('{0}-{1}', parameters('vmNameLinux'), uniqueString(resourceGroup().id)))]",
             "toolTip": "Unique DNS Name for the Public IP used to access the Virtual Machine.",
-            "visible": true,
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "ubuntuOSVersion",
             "type": "Microsoft.Common.DropDown",
-            "label": "The Ubuntu version for the VM",
-            "toolTip": "ubuntu version",
+            "label": "Ubuntu OS Version",
             "defaultValue": "18.04-LTS",
-            "visible": true,
+            "toolTip": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.",
             "constraints": {
+              "required": false,
               "allowedValues": [
                 {
                   "label": "12.04.5-LTS",
                   "value": "12.04.5-LTS"
                 },
                 {
+                  "label": "14.04.5-LTS",
+                  "value": "14.04.5-LTS"
+                },
+                {
+                  "label": "16.04.0-LTS",
+                  "value": "16.04.0-LTS"
+                },
+                {
                   "label": "18.04-LTS",
                   "value": "18.04-LTS"
                 }
               ]
-            }
+            },
+            "visible": true
           },
           {
             "name": "locationLinux",
             "type": "Microsoft.Common.TextBox",
-            "label": "Location for all resources.",
-            "toolTip": "Location for all resources.",
+            "label": "Location Linux",
             "defaultValue": "[resourceGroup().location]",
-            "visible": true,
+            "toolTip": "Location for all resources.",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
-            "name": "vmSize",
+            "name": "vmSizeLinux",
             "type": "Microsoft.Common.TextBox",
-            "label": "Size of the Virtual Machine.",
-            "toolTip": "VM Size",
+            "label": "Vm Size Linux",
             "defaultValue": "Standard_DS1",
-            "visible": true,
+            "toolTip": "The size of the VM",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "virtualNetworkName",
             "type": "Microsoft.Common.TextBox",
-            "label": "Name of the Vnet",
-            "toolTip": "name of the Vnet",
+            "label": "Virtual Network Name",
             "defaultValue": "vNet",
-            "visible": true,
+            "toolTip": "Name of the VNET",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "subnetName",
             "type": "Microsoft.Common.TextBox",
-            "label": "Name of the subnet in the virtual network",
-            "toolTip": "Name of the subnet in the virtual network",
+            "label": "Subnet Name",
             "defaultValue": "Subnet",
-            "visible": true,
+            "toolTip": "Name of the subnet in the virtual network",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           },
           {
             "name": "networkSecurityGroupName",
             "type": "Microsoft.Common.TextBox",
-            "label": "Name of the Network Security Group",
-            "toolTip": "Name of the Network Security Group",
+            "label": "Network Security Group Name",
             "defaultValue": "SecGroupNet",
-            "visible": true,
+            "toolTip": "Name of the Network Security Group",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": "^[\\w-'][\\w-'\\s.]*[\\w-']+$",
-              "validationMessage": "invalid"
-            }
+              "validationMessage": "invalid name."
+            },
+            "visible": true
           }
         ]
       }
     ],
     "outputs": {
+      "adminUsername": "[steps('windowsVM').adminUsername]",
+      "adminPassword": "[steps('windowsVM').adminPassword]",
+      "dnsLabelPrefix": "[steps('windowsVM').dnsLabelPrefix]",
+      "publicIpName": "[steps('windowsVM').publicIpName]",
       "publicIPAllocationMethod": "[steps('windowsVM').publicIPAllocationMethod]",
       "publicIpSku": "[steps('windowsVM').publicIpSku]",
       "OSVersion": "[steps('windowsVM').OSVersion]",
-      "ubuntuOSVersion": "[steps('linuxVM').ubuntuOSVersion]",
+      "vmSize": "[steps('windowsVM').vmSize]",
       "location": "[location()]",
-      "adminUsername": "[steps('windowsVM').adminUserName]",
-      "adminPassword": "[steps('windowsVM').adminPassword]",
-      "adminUsernameLinux": "[steps('linuxVM').adminUsernameLinux]",
-      "adminPasswordOrKey": "[steps('linuxVM').authenticationType]"
+      "vmName": "[steps('windowsVM').vmName]",
+      "vmNameLinux": "[steps('LinuxVM').vmNameLinux]",
+      "adminUsernameLinux": "[steps('LinuxVM').adminUsernameLinux]",
+      "adminPasswordOrKey": "[coalesce(steps('LinuxVM').adminPasswordOrKeyauthenticationType.sshPublicKey, steps('LinuxVM').adminPasswordOrKeyauthenticationType.password)]",
+      "authenticationType": "[steps('LinuxVM').adminPasswordOrKeyauthenticationType.authenticationType]",
+      "dnsLabelPrefixLinux": "[steps('LinuxVM').dnsLabelPrefixLinux]",
+      "ubuntuOSVersion": "[steps('LinuxVM').ubuntuOSVersion]",
+      "locationLinux": "[steps('LinuxVM').locationLinux]",
+      "vmSizeLinux": "[steps('LinuxVM').vmSizeLinux]",
+      "virtualNetworkName": "[steps('LinuxVM').virtualNetworkName]",
+      "subnetName": "[steps('LinuxVM').subnetName]",
+      "networkSecurityGroupName": "[steps('LinuxVM').networkSecurityGroupName]"
     }
   }
 }

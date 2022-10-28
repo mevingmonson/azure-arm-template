@@ -17,9 +17,19 @@ mevinvn
 
 
 
-https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json?token=GHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ
+https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json?token=GHSAT0AAAAAABZK4N3FBD43BCIA54T7T4HCY23QJIA
 
-$url = "https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json?token=GHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ"
+$url = "https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json"
 [uri]::EscapeDataString($url)
 
 https%3A%2F%2Fraw.githubusercontent.com%2Fmevingmonson%2Fazure-arm-template%2Fmain%2Ftestcase%2Fazuredeploy.json%3Ftoken%3DGHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ
+
+
+
+https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json
+
+
+https%3A%2F%2Fraw.githubusercontent.com%2Fmevingmonson%2Fazure-arm-template%2Fmain%2Ftestcase%2Fazuredeploy.json
+
+
+https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmevingmonson%2Fazure-arm-template%2Fmain%2Ftestcase%2Fazuredeploy.json
