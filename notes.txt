@@ -12,3 +12,14 @@ https://management.azure.com/batch?api-version=2020-06-01
 
 cb644fd5-04bf-4a99-a4a2-fe6b3e1b31b5
 mevinvn
+
+
+
+
+
+https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json?token=GHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ
+
+$url = "https://raw.githubusercontent.com/mevingmonson/azure-arm-template/main/testcase/azuredeploy.json?token=GHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ"
+[uri]::EscapeDataString($url)
+
+https%3A%2F%2Fraw.githubusercontent.com%2Fmevingmonson%2Fazure-arm-template%2Fmain%2Ftestcase%2Fazuredeploy.json%3Ftoken%3DGHSAT0AAAAAABZK4N3F7ZENU5ZJCUEZQCL6Y23QCJQ
