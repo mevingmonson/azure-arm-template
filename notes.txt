@@ -1,0 +1,14 @@
+New-AzureRmResourceGroup -Name ExampleResourceGroup -Location "centralus"
+
+New-AzureRmResourceGroupDeployment `
+-Name ExampleDeployment `
+-ResourceGroupName Resource-3 `
+-TemplateFile https://csg10032000c7f9a1b5.blob.core.windows.net/newcontainer/example.json `
+-TemplateParameterFile https://csg10032000c7f9a1b5.blob.core.windows.net/newcontainer/example.parameters.json
+
+Microsoft.Compute/virtualMachines
+
+https://management.azure.com/batch?api-version=2020-06-01
+
+cb644fd5-04bf-4a99-a4a2-fe6b3e1b31b5
+mevinvn

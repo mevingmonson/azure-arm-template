@@ -1,0 +1,8 @@
+{
+  "resourceGroup": {
+    "value": "resource-2"
+  },
+  "location": {
+    "value": "centralus"
+  }
+}
